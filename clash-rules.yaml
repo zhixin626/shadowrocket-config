@@ -276,6 +276,9 @@ rules:
   - DOMAIN-SUFFIX,cctv.com,DIRECT
   - DOMAIN-SUFFIX,cctvpic.com,DIRECT
   - DOMAIN-SUFFIX,douyu.com,DIRECT
+  - DOMAIN-SUFFIX,douyuscdn.com,DIRECT
+  - DOMAIN-SUFFIX,douyutv.com,DIRECT
+  - DOMAIN-SUFFIX,douyucdn.com,DIRECT
   - DOMAIN-SUFFIX,huya.com,DIRECT
   - DOMAIN-SUFFIX,chushou.tv,DIRECT
   - DOMAIN-SUFFIX,livechina.com,DIRECT
