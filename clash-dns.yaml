@@ -1,0 +1,57 @@
+# Clash Verge 的 DNS 覆写设置（不会被 3x-ui 订阅自动使用，需要手动粘贴）
+#
+# 用法：
+#   1. Clash Verge → 设置 → 打开「DNS 覆写」，把本文件全部内容替换进去，保存。
+#   2. 关闭 Clash Verge 的 IPv6 开关（和下面的 ipv6: false 保持一致）。
+#   3. 开启「虚拟网卡模式」（TUN），否则部分 App 的 DNS 查询不经过 Clash。
+#   4. 重启 Clash 内核，打开 browserleaks.com/dns 检查：只应出现 Cloudflare，不应出现中国的 DNS。
+#
+# 设计原则与小火箭 default626.conf 的 [General] 段一致，详见 README.md。
+# 如果保存时报错，可能是你的版本不认 system，把两处 'system' 换成 '223.5.5.5'。
+
+dns:
+  enable: true
+  listen: ':53'
+  # 关闭 IPv6，对应小火箭 ipv6 = false
+  ipv6: false
+  # fake-ip：App 查 DNS 时立刻拿到占位地址，不在本地真查
+  # 走代理的域名原样交给 VPS 解析，既防泄漏，也不会因本地 DNS 不稳而卡住
+  enhanced-mode: fake-ip
+  fake-ip-range: '198.18.0.1/16'
+  fake-ip-filter-mode: blacklist
+  # 这些域名不用占位地址，返回真实 IP（局域网、时间同步、系统联网检测等）
+  fake-ip-filter:
+    - '*.lan'
+    - '*.local'
+    - '*.arpa'
+    - 'time.*.com'
+    - 'ntp.*.com'
+    - '+.market.xiaomi.com'
+    - 'localhost.ptlogin2.qq.com'
+    - '*.msftncsi.com'
+    - 'www.msftconnecttest.com'
+  prefer-h3: false
+  # DNS 查询本身也按规则走：发往 1.1.1.1 的查询会经过 VPS，不从国内网络直接发出
+  respect-rules: true
+  use-hosts: true
+  use-system-hosts: true
+  # 只用来解析下面 DNS 服务器自己的地址（这里都写的 IP，基本用不到），不查你访问的网站
+  default-nameserver:
+    - '223.5.5.5'
+  # 必须本地解析时用的 DNS：境外加密 DNS，对应小火箭 dns-server / fallback-dns-server
+  # 绝不填国内 DNS 或 system
+  nameserver:
+    - 'https://1.1.1.1/dns-query'
+    - 'https://1.0.0.1/dns-query'
+  # 命中 DIRECT 规则的国内域名用系统 DNS，拿到国内 CDN 节点，对应小火箭 dns-direct-system = true
+  direct-nameserver:
+    - 'system'
+  direct-nameserver-follow-policy: false
+  # 局域网域名交给系统 DNS
+  nameserver-policy:
+    '+.lan,+.local,+.arpa': 'system'
+  # 只用来解析节点地址（节点写的是 IP，基本用不到）
+  proxy-server-nameserver:
+    - 'https://223.5.5.5/dns-query'
+  fallback: []
+hosts: {}

@@ -1,7 +1,7 @@
 # 3x-ui 面板 Clash/Mihomo 全局路由规则（Windows Clash Verge 使用）
 # 由 default626.conf（小火箭）的 [Rule] 段翻译而来，规则内容、顺序、含义保持一致。
 # 改规则时先改 default626.conf，再同步到这里。原则和语法对照见 README.md。
-# 节点和 DNS 由面板生成，本文件只放 proxy-groups 和 rules。
+# 节点由面板生成，本文件只放 proxy-groups 和 rules。DNS 设置见 clash-dns.yaml（需手动粘贴到 Clash Verge）。
 
 proxy-groups:
   # include-all-proxies 自动包含面板生成的所有节点，规则里不写具体节点名

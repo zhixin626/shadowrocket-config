@@ -5,7 +5,8 @@
 | 文件 | 用在哪 | 说明 |
 |---|---|---|
 | `default626.conf` | 小火箭（iPhone、Mac） | **主文件**，所有改动先改这里 |
-| `clash-rules.yaml` | 3x-ui 的 Clash/Mihomo 订阅（Windows Clash Verge） | 照着小火箭的规则翻译成 Clash 语法 |
+| `clash-rules.yaml` | 3x-ui 的 Clash/Mihomo 订阅（Windows Clash Verge） | 照着小火箭的规则翻译成 Clash 语法，3x-ui 自动拉取 |
+| `clash-dns.yaml` | Clash Verge 的「DNS 覆写」 | 对应小火箭 `[General]` 的 DNS 部分，**需要手动粘贴** |
 
 ---
 
@@ -84,8 +85,16 @@
 ### DNS 设置
 
 - 小火箭的 DNS 写在 `default626.conf` 的 `[General]` 段。
-- Clash 的 DNS 由 3x-ui 面板生成，`clash-rules.yaml` 只放 `proxy-groups` 和 `rules`。
-- 面板里的 Clash DNS 设置也要符合"整体思想"第 3、4 条：主 DNS 和备用 DNS 用境外加密 DNS，不退回国内 DNS。
+- 3x-ui 只从 `clash-rules.yaml` 里取 `proxy-groups` 和 `rules`，DNS 写进去不会生效。
+- Clash 的 DNS 单独放在 `clash-dns.yaml`，同样要符合"整体思想"第 3、4 条。改了小火箭的 DNS 设置，也要同步改这个文件。
+
+### Clash Verge 使用步骤
+
+1. **订阅**：在 Clash Verge 里添加 3x-ui 的订阅链接。节点由面板生成，规则来自 `clash-rules.yaml`，点更新就会同步 GitHub 上的最新规则。
+2. **替换 DNS 覆写**：设置 → 打开「DNS 覆写」，把 `clash-dns.yaml` 的全部内容替换进去，保存。Clash Verge 自带的默认 DNS 用的是国内 DNS，会泄露，必须替换。
+3. **关闭 IPv6 开关**：和 DNS 里的 `ipv6: false` 保持一致，避免 IPv4 / IPv6 来回切换。
+4. **开启虚拟网卡模式（TUN）**：系统代理模式只接管走代理设置的程序，很多 App 的 DNS 查询会绕过 Clash；虚拟网卡模式会接管所有流量和 DNS 查询。
+5. **重启内核并检查**：打开 `browserleaks.com/dns`，结果里只应出现 Cloudflare，不应出现中国的 DNS 服务器。
 
 ---
 
@@ -94,4 +103,5 @@
 1. 先改 `default626.conf`。
 2. 检查是否违背"整体思想"里的任何一条。
 3. 按"语法对照"把同样的改动写进 `clash-rules.yaml`，放在对应的位置。
-4. 提交后，小火箭和 Clash 各自更新一次配置。
+4. 如果改的是 DNS 设置，同步改 `clash-dns.yaml`。
+5. 提交后，小火箭和 Clash 各自更新一次配置。改了 `clash-dns.yaml` 的话，要重新粘贴到 Clash Verge 的 DNS 覆写里。
