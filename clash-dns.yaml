@@ -4,7 +4,8 @@
 #   1. Clash Verge → 设置 → 打开「DNS 覆写」，把本文件全部内容替换进去，保存。
 #   2. 关闭 Clash Verge 的 IPv6 开关（和下面的 ipv6: false 保持一致）。
 #   3. 开启「虚拟网卡模式」（TUN），否则部分 App 的 DNS 查询不经过 Clash。
-#   4. 重启 Clash 内核，打开 browserleaks.com/dns 检查：只应出现 Cloudflare，不应出现中国的 DNS。
+#   4. 关闭浏览器的「使用安全 DNS」（Chrome：设置 → 隐私和安全 → 安全）。
+#   5. 完全退出再打开 Clash Verge，访问 browserleaks.com/dns 检查：应全是境外 DNS，不应出现中国的 DNS。
 #
 # 设计原则与小火箭 default626.conf 的 [General] 段一致，详见 README.md。
 # 如果保存时报错，可能是你的版本不认 system，把两处 'system' 换成 '223.5.5.5'。
