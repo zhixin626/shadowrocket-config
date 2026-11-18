@@ -1,6 +1,8 @@
 # 代理规则说明
 
-本仓库有两份规则文件，说的是**同一套规则**，只是语法不同：
+一套自用的代理分流规则，同时提供小火箭和 Clash 两个版本，规则内容和思想完全一致。
+
+修改规则、维护两个版本的方法见 [维护说明.md](维护说明.md)。
 
 | 文件 | 用在哪 | 说明 |
 |---|---|---|
@@ -54,42 +56,17 @@
 
 ---
 
-## 二、Clash 版本怎么写
+## 二、使用说明
 
-**规则：`clash-rules.yaml` 必须和 `default626.conf` 表达同样的规则和含义。** 改了小火箭的规则，要同步改 Clash 的。
+### 小火箭（iPhone、Mac）
 
-### 要保持一致的地方
+1. **导入配置**：小火箭 → 配置 → 右上角添加，填入
+   `https://raw.githubusercontent.com/zhixin626/shadowrocket-config/main/default626.conf`
+   然后选中它作为当前配置。
+2. **使用「配置」（规则）模式**，不要用全局模式。全局模式会让所有国内流量也绕道美国。
+3. **更新**：仓库里的规则有改动后，在配置列表里对这份配置点「更新」。注意：在手机上直接改的内容，更新时会被 GitHub 上的版本覆盖，长期要用的改动要提交到仓库。
 
-- **规则内容一致**：小火箭里有的域名规则，Clash 里也要有，策略（PROXY / DIRECT / REJECT）相同。
-- **规则顺序一致**：两边都是从上往下匹配、命中第一条就停。小火箭里写着"必须在某某规则之前"的，Clash 里也要保持这个先后。
-- **上面"整体思想"里的每一条，两边都要满足**：IP 类规则都加 `no-resolve`，兜底永远是代理。
-
-### 语法对照
-
-| 含义 | 小火箭 `default626.conf` | Clash/Mihomo `clash-rules.yaml` |
-|---|---|---|
-| 规则写在哪 | `[Rule]` 段，每行一条 | `rules:` 下，每条前面加 `- ` |
-| 精确域名 | `DOMAIN,a.com,PROXY` | `- DOMAIN,a.com,PROXY` |
-| 域名后缀 | `DOMAIN-SUFFIX,a.com,PROXY` | `- DOMAIN-SUFFIX,a.com,PROXY` |
-| 域名关键字 | `DOMAIN-KEYWORD,google,PROXY` | `- DOMAIN-KEYWORD,google,PROXY` |
-| IP 段 | `IP-CIDR,17.0.0.0/8,PROXY,no-resolve` | `- IP-CIDR,17.0.0.0/8,PROXY,no-resolve` |
-| IPv6 段 | `IP-CIDR6,fe80::/10,DIRECT,no-resolve` | `- IP-CIDR6,fe80::/10,DIRECT,no-resolve` |
-| 国家 IP | `GEOIP,CN,DIRECT,no-resolve` | `- GEOIP,CN,DIRECT,no-resolve` |
-| ASN | `IP-ASN,132203,DIRECT,no-resolve` | `- IP-ASN,132203,DIRECT,no-resolve` |
-| 按协议 | `PROTOCOL,UDP` | `NETWORK,UDP` |
-| 组合规则 | `AND,((PROTOCOL,UDP),(DST-PORT,443)),REJECT-NO-DROP` | `- AND,((NETWORK,UDP),(DST-PORT,443)),REJECT` |
-| 兜底 | `FINAL,PROXY` | `- MATCH,PROXY` |
-| 按程序名（仅电脑） | `PROCESS-NAME,YoudaoDict,DIRECT` | `- PROCESS-NAME,YoudaoDict,DIRECT` |
-
-策略名两边一样：`PROXY`、`DIRECT`、`REJECT`。Clash 里的 `PROXY` 是文件开头 `proxy-groups` 定义的节点选择组，自动包含面板生成的所有节点，不要在规则里写具体节点名。
-
-### DNS 设置
-
-- 小火箭的 DNS 写在 `default626.conf` 的 `[General]` 段。
-- 3x-ui 只从 `clash-rules.yaml` 里取 `proxy-groups` 和 `rules`，DNS 写进去不会生效。
-- Clash 的 DNS 单独放在 `clash-dns.yaml`，同样要符合"整体思想"第 3、4 条。改了小火箭的 DNS 设置，也要同步改这个文件。
-
-### Clash Verge 使用步骤
+### Clash Verge（Windows）
 
 1. **订阅**：在 Clash Verge 里添加 3x-ui 的订阅链接。节点由面板生成，规则来自 `clash-rules.yaml`，点更新就会同步 GitHub 上的最新规则。
 2. **替换 DNS 覆写**：设置 → 打开「DNS 覆写」，把 `clash-dns.yaml` 的全部内容替换进去，保存。Clash Verge 自带的默认 DNS 用的是国内 DNS，会泄露，必须替换。
@@ -105,7 +82,11 @@
 5. **关闭浏览器的「安全 DNS」**：理由见下方"为什么要关闭浏览器的「安全 DNS」"一节。
 6. **重启内核并检查**：完全退出 Clash Verge 再打开，然后访问 `browserleaks.com/dns`。结果里应该全是境外（美国）的 DNS 服务器，具体是哪家不重要（取决于 VPS 或住宅出口用的 DNS）；只要出现所在地为中国、或属于电信 / 联通 / 移动 / 阿里 / 腾讯的服务器，就说明有泄露。
 
-### 为什么要关闭浏览器的「安全 DNS」
+#### 补充：使用 Tailscale 时
+
+- 取消 Tailscale 设置里的「Use Tailscale DNS settings」。理由见下方对应一节。
+
+#### 为什么要关闭浏览器的「安全 DNS」
 
 操作：Chrome → 设置 → 隐私和安全 → 安全 → 关闭「使用安全 DNS」。Edge：设置 → 隐私、搜索和服务 → 安全性 → 关闭「使用安全 DNS」。
 
@@ -115,25 +96,21 @@
 - 关掉后，浏览器问系统 DNS → 被虚拟网卡截住 → Clash 用 fake-ip 回答 → 真正的解析由 VPS 完成，符合"整体思想"第 3 条。
 - 浏览器设置里的 OpenDNS、CleanBrowsing 等选项都属于这个功能，同样不要用。
 
-### 为什么要开启「严格路由」
+#### 为什么要开启「严格路由」
 
 - 开了虚拟网卡后，电脑上同时有虚拟网卡和真实网卡（Wi-Fi / 有线）。不开严格路由时，Clash 只是"建议"流量走虚拟网卡，并不禁止走真实网卡。
 - Windows 查 DNS 时会**同时问所有网卡**上的 DNS 服务器，谁先回答用谁的。所以即使 Clash 接管了，Windows 仍会通过真实网卡去问运营商 DNS，造成 DNS 泄露。
 - 开启后，Clash 用路由和防火墙规则把真实网卡这条路堵死，所有流量和 DNS 查询只能走虚拟网卡。
 - 代价：局域网设备（打印机、NAS、投屏）可能连不上，靠"排除网段"解决；少数软件可能异常；Clash 崩溃时可能整台电脑断网，重启 Clash 或关掉虚拟网卡模式即可恢复。
 
-### 为什么要填「排除网段」
+#### 为什么要填「排除网段」
 
 - 对应小火箭的 `tun-excluded-routes`，列表完全相同（见 `clash-tun-exclude.txt`）。
 - 这些是局域网、本机、组播和各类保留地址，本来就不该走代理。开了严格路由后，不排除它们，访问路由器、NAS、打印机等可能出问题。
 - `100.64.0.0/10` 是 Tailscale 使用的网段，排除后 Tailscale 直接走自己的网卡，不经过 Clash。
 
----
+#### 为什么要取消 Tailscale 的「Use Tailscale DNS settings」
 
-## 三、改规则的步骤
-
-1. 先改 `default626.conf`。
-2. 检查是否违背"整体思想"里的任何一条。
-3. 按"语法对照"把同样的改动写进 `clash-rules.yaml`，放在对应的位置。
-4. 如果改的是 DNS 设置，同步改 `clash-dns.yaml`。
-5. 提交后，小火箭和 Clash 各自更新一次配置。改了 `clash-dns.yaml` 的话，要重新粘贴到 Clash Verge 的 DNS 覆写里。
+- 勾选时，Tailscale 接管 Windows 的 DNS，把查询发给它内置的解析器 `100.100.100.100`，再由它转发给上游。没在 Tailscale 后台设上游时，上游通常就是电脑原来的运营商 DNS。
+- `100.100.100.100` 在排除网段 `100.64.0.0/10` 里，发给它的查询不经过 Clash，DNS 劫持也截不到，可能造成 DNS 泄露。
+- 访问 Tailscale 设备时直接用 `100.x.x.x` 的 IP 就不需要它，取消勾选不影响使用。只有需要用设备名（MagicDNS）访问时才要另想办法。
