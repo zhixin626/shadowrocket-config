@@ -219,6 +219,12 @@ rules:
   - DOMAIN-SUFFIX,alibaba.com,DIRECT
   - DOMAIN-SUFFIX,alikunlun.com,DIRECT
   - DOMAIN-SUFFIX,alipay.com,DIRECT
+  # 支付宝 / 网商银行（mybank.cn 已被 DOMAIN-SUFFIX,cn 覆盖）
+  - DOMAIN-SUFFIX,alipayobjects.com,DIRECT
+  # 阿里巴巴诚盾：设备风控
+  - DOMAIN-SUFFIX,alibabachengdun.com,DIRECT
+  # 阿里云杭州地域（网商银行 mPaaS）；只写国内地域，不写整个 aliyuncs.com，避免阿里云海外地域被直连
+  - DOMAIN-SUFFIX,cn-hangzhou.aliyuncs.com,DIRECT
   - DOMAIN-SUFFIX,amap.com,DIRECT
   - DOMAIN-SUFFIX,autonavi.com,DIRECT
   - DOMAIN-SUFFIX,tmall.com,DIRECT
